@@ -8,7 +8,7 @@ public class Move : MonoBehaviour
     public float time;
     public float speed;
     
-    private float _timer;
+    private float _timer; 
 
     private void Update()
     {

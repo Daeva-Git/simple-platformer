@@ -1,4 +1,3 @@
-using Unity.VisualScripting;
 using UnityEngine;
 
 public class Movement : MonoBehaviour
@@ -13,13 +12,24 @@ public class Movement : MonoBehaviour
     private float _currentSpeedMultiplier = 1;
     
     private Vector3 _temp;
-    private bool _isGrounded;
+    [SerializeField] private float maxSpeed;
 
     private void Start()
     {
         _rigidbody = GetComponent<Rigidbody>();
     }
+
+
+    private void Update()
+    {
+        // clamp velocity
+        if (_rigidbody.velocity.magnitude > maxSpeed)
+        {
+            _rigidbody.velocity = Vector3.ClampMagnitude(_rigidbody.velocity, maxSpeed);
+        }
+    }
     
+
     private void FixedUpdate()
     {
         UpdateSprint();
@@ -41,17 +51,22 @@ public class Movement : MonoBehaviour
             _currentSpeedMultiplier = 1;
         }
     }
-    
 
     private void Jump()
     {
-        _isGrounded = false;
-        _rigidbody.AddForce(Vector3.up * jumpHeight);
+        if (!IsGrounded()) return;
+        
+        _rigidbody.AddForce(Vector3.up * jumpHeight * Time.fixedDeltaTime, ForceMode.Impulse);
+    }
+
+    private bool IsGrounded()
+    {
+        return _rigidbody.velocity.y == 0;
     }
 
     private void Move(Vector3 direction)
     {
-        _rigidbody.AddForce(direction * speed);
+        _rigidbody.AddForce(direction * speed * Time.fixedDeltaTime);
     }
 
     private void MoveLeft()
